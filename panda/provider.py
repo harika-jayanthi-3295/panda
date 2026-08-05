@@ -76,18 +76,23 @@ def _to_wire(messages: list[dict]) -> list[dict]:
             wire.append({"role": "assistant", "content": content})
             i += 1
         elif m["role"] == "tool":
-            # Rebuild the name→id map from the preceding assistant turn.
-            id_map: dict = {}
+            # Rebuild ordered (name, id) list from the preceding assistant turn.
+            # Must use position-based matching, not name-based, because the same
+            # tool can be called multiple times in one turn (parallel tool calls).
+            call_ids: list[tuple] = []
             for prev in reversed(messages[:i]):
                 if prev["role"] == "assistant":
-                    id_map = {c["name"]: c.get("signature", c["name"])
-                              for c in prev.get("tool_calls", [])}
+                    call_ids = [(c["name"], c.get("signature", c["name"]))
+                                for c in prev.get("tool_calls", [])]
                     break
             results: list[dict] = []
+            pos = 0
             while i < len(messages) and messages[i]["role"] == "tool":
                 t = messages[i]; i += 1
+                tid = call_ids[pos][1] if pos < len(call_ids) else t["name"]
+                pos += 1
                 results.append({"type": "tool_result",
-                                 "tool_use_id": id_map.get(t["name"], t["name"]),
+                                 "tool_use_id": tid,
                                  "content": t["text"]})
             wire.append({"role": "user", "content": results})
     return wire
