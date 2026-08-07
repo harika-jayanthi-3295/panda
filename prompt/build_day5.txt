@@ -1,0 +1,102 @@
+I have built panda so far at this Github repo: https://github.com/VizuaraAI/panda-Workshop/tree/main/panda
+Today I want to go ahead and add the following:
+harness.py
+fleet.py
+cli.py
+___main___.py
+Write panda/harness.py to this exact contract.
+- class Harness(workdir=".", model=None, policy=None, extra_tools=None,
+  system_extra="", on_event=None, budget_tokens=600_000, max_turns=120,
+  session_path=None, enable_subagents=True, persist=True, _depth=0).
+- Construction: realpath and create the workdir; model defaults to the
+  panda_MODEL env var then provider.DEFAULT_MODEL; policy defaults to
+  Policy("yolo"); tools = core_tools(workdir) as a name-keyed dict; add a
+  remember tool wrapping memory.remember; when skills exist, add use_skill;
+  when enable_subagents, add spawn_agent via a make_child that constructs a
+  Harness over the same workdir and policy with persist=False (children are
+  ephemeral — a child session log must never hijack --resume); merge
+  extra_tools; system prompt = memory.build_system_prompt(workdir, skills
+  catalog_prompt + system_extra).
+- resume(path=None): load session.latest when no path given; set messages and
+  session_path; return True when messages loaded.
+- run(task) -> str: when persist and no session_path yet, create one from the
+  first 32 chars of the task. Append and record the user message. Record every
+  new message as it lands (clamp the recorded index if compaction shrank the
+  list). Call loop.run_loop with before_tool=policy.check and
+  before_turn=compaction against budget_tokens; return the final text.
+Write panda/__init__.py exporting Harness, Policy, Tool, tool — and
+panda/__main__.py deferring to a cli main() (a stub today; day 5 completes
+it). Update .gitignore with .panda/.
+Verify before finishing, both: (1) start "Create part1.txt through part5.txt one
+at a time, then SUMMARY.md describing each", kill -9 the process partway, run
+again in the same directory calling resume() then run("continue the task") —
+the transcript shows the interruption notice and all six files exist at the end;
+(2) "Use spawn_agent twice: delegate writing utils.py with a slugify(text)
+function to one child, and test_utils.py with five asserts to another; then run
+python3 test_utils.py yourself and report" — the parent runs the tests itself,
+and .panda/sessions contains exactly one session file.
+Write panda/harness.py to this exact contract.
+- class Harness(workdir=".", model=None, policy=None, extra_tools=None,
+  system_extra="", on_event=None, budget_tokens=600_000, max_turns=120,
+  session_path=None, enable_subagents=True, persist=True, _depth=0).
+- Construction: realpath and create the workdir; model defaults to the
+  panda_MODEL env var then provider.DEFAULT_MODEL; policy defaults to
+  Policy("yolo"); tools = core_tools(workdir) as a name-keyed dict; add a
+  remember tool wrapping memory.remember; when skills exist, add use_skill;
+  when enable_subagents, add spawn_agent via a make_child that constructs a
+  Harness over the same workdir and policy with persist=False (children are
+  ephemeral — a child session log must never hijack --resume); merge
+  extra_tools; system prompt = memory.build_system_prompt(workdir, skills
+  catalog_prompt + system_extra).
+- resume(path=None): load session.latest when no path given; set messages and
+  session_path; return True when messages loaded.
+- run(task) -> str: when persist and no session_path yet, create one from the
+  first 32 chars of the task. Append and record the user message. Record every
+  new message as it lands (clamp the recorded index if compaction shrank the
+  list). Call loop.run_loop with before_tool=policy.check and
+  before_turn=compaction against budget_tokens; return the final text.
+Write panda/__init__.py exporting Harness, Policy, Tool, tool — and
+panda/__main__.py deferring to a cli main() (a stub today; day 5 completes
+it). Update .gitignore with .panda/.
+Verify before finishing, both: (1) start "Create part1.txt through part5.txt one
+at a time, then SUMMARY.md describing each", kill -9 the process partway, run
+again in the same directory calling resume() then run("continue the task") —
+the transcript shows the interruption notice and all six files exist at the end;
+(2) "Use spawn_agent twice: delegate writing utils.py with a slugify(text)
+function to one child, and test_utils.py with five asserts to another; then run
+python3 test_utils.py yourself and report" — the parent runs the tests itself,
+and .panda/sessions contains exactly one session file.
+You are building day 5 of panda, the final day. Cumulative state: the
+package is complete except its front door and fleet: provider.py, loop.py,
+tools.py, security.py, context.py, memory.py, skills.py, session.py,
+subagent.py, harness.py, __init__.py, __main__.py (stub). Today finishes the
+product and proves it by building real software with it. The day-1 code
+standard applies. Commit as you go.
+Write panda/cli.py to this exact contract.
+- main(argv=None): argparse with -p/--prompt (headless task), -d/--workdir
+  (default "."), -m/--model, --mode in {safe, yolo, read-only} (default: safe
+  interactively, yolo when -p is given), --resume, --max-turns (default 120).
+- An event printer: assistant text plainly; tool calls as one line with the
+  tool name and clipped arguments; the first line of each result dimmed under
+  it. An approver that shows the call and asks "approve ...? [y/N]".
+- Headless: build the Harness, optionally resume, run the prompt, exit 0.
+- Interactive: a banner naming the model, mode, and jail directory, then a
+  prompt loop; Ctrl-D exits; Ctrl-C interrupts a run, prints that the session
+  log is safe and --resume continues it.
+- Point panda/__main__.py at cli.main so python3 -m panda works.
+Write panda/fleet.py to this exact contract.
+- run_fleet(jobs, make_harness, max_workers=4): jobs are [{name, workdir,
+  task}]. ThreadPoolExecutor; each job builds make_harness(workdir) and runs
+  its task; exceptions become {"name", "ok": False, "report": "<type>:
+  <message>"}; successes {"name", "ok": True, "report": final text}; results
+  return in input order. Export run_fleet from __init__.py.
+Write a README.md: what panda is (the smallest agent harness; ten files,
+zero dependencies), how to run it (env var, the three CLI forms), the
+day-by-day anatomy table, and a composition example registering one extra tool.
+After this is built, we should have exactly these files:
+
+Day 1provider.py · loop.py172 / 894tonight
+Day 2tools.py · security.py+212day 2
+Day 3context.py · memory.py · skills.py+149day 3
+Day 4session.py · subagent.py · harness.py · __init__.py+241day 4
+Day 5cli.py · fleet.py · __main__.py

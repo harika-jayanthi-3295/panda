@@ -1,0 +1,32 @@
+Now prove the harness by building products with it — the same way the
+reference build shipped 25 projects. Create skills/design-engineering/SKILL.md
+in each project workdir with this quality bar (verbatim): a real design system
+as CSS custom properties; at least 9 distinct sections for a landing page; at
+least 1,200 words of real copy, no lorem ipsum; at least 4 hand-drawn inline
+SVG illustrations, one being a product artifact in the hero; at least 3 working
+interactive behaviors; responsive at 360, 768, and 1280; semantic HTML with
+focus states; a self-review pass before finishing that counts sections, words,
+SVGs, and interactions against these minimums and fixes any shortfall.
+Then run these through run_fleet with your harness, one fresh directory each,
+in two phases per project — first the build, then a second run in the same
+session: "Review every file you produced against the skill bar as a demanding
+design director; list 12 concrete deficiencies; fix them all; verify again."
+1. artisan-coffee: a self-contained index.html for a specialty coffee roaster
+   in Goa — sticky nav, hero with a drawn product artifact, six origin cards
+   with prices, a three-tier subscription table with a working monthly/annual
+   toggle, brew-guide tabs, an FAQ accordion, a dark-mode toggle persisted to
+   localStorage.
+2. taskman: a python CLI task manager — argparse subcommands add, list, done,
+   rm, stats; JSON persistence; aligned table output; a unittest suite of 10+
+   cases run via subprocess against a temp store; all tests green.
+3. viper: a canvas snake game in one index.html — grid movement on
+   requestAnimationFrame, food, speed-up every 5 foods, score, pause, restart,
+   high score in localStorage.
+Verification, mechanically: required files exist; python3 tests pass for
+taskman; greps confirm localStorage and an accordion in artisan-coffee and
+requestAnimationFrame in viper; word count of visible text in artisan-coffee
+exceeds 1,200. Finish with a results table: project, pass/fail, turns, and one
+line on contents. Your harness should clear the same bar the reference build
+cleared; if a project falls short, run one more review pass rather than
+lowering the bar.
+Never use your own harness. Only use panda for everything! I have claude LLM with API Key which you can use.
