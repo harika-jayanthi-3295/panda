@@ -29,7 +29,7 @@ def complete(model: str, system: str, messages: list[dict],
     hdrs = {"Content-Type": "application/json",
             "x-api-key": api_key(), "anthropic-version": "2023-06-01"}
     body: dict = {
-        "model": model, "max_tokens": 65536, "temperature": 0.4,
+        "model": model, "max_tokens": 8096, "temperature": 0.4,
         "system": system, "messages": _to_wire(messages),
     }
     if tools:
