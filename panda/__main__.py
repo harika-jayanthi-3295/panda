@@ -1,5 +1,5 @@
 """
-Day 4 entry point: delegates to cli.main(); day 5 completes the CLI.
+Day 5 entry point: python3 -m panda delegates to cli.main().
 """
 from .cli import main
 

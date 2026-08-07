@@ -7,7 +7,7 @@ Design  : pure stdlib; one public entry-point (complete); HTTP isolated in _post
 import json, os, time, urllib.error, urllib.request
 
 API_ROOT      = "https://api.anthropic.com/"
-DEFAULT_MODEL = "claude-opus-4-6"
+DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
 
 def api_key() -> str:
