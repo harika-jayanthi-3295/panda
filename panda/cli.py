@@ -91,7 +91,14 @@ def main(argv=None) -> None:
     ap.add_argument("--resume",    action="store_true", help="resume latest session")
     ap.add_argument("--max-turns", type=int, default=120, metavar="N",
                     help="max agent turns per run (default: 120)")
+    ap.add_argument("serve", nargs="?", help="launch the web UI (python3 -m panda serve)")
     args = ap.parse_args(argv)
+
+    # ── serve sub-command ─────────────────────────────────────────────────
+    if args.serve == "serve":
+        from .server import main as _serve
+        _serve()
+        return
 
     headless = bool(args.prompt)
     harness  = _build_harness(args, headless)

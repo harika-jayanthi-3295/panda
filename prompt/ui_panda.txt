@@ -1,0 +1,1 @@
+I just built this. I want to integrate a UI layer into it so that I can run it from web like Lovable. That way, I just type in a prompt and I can see the thinking process of the claude model underneath, and build products from that UI layer.
