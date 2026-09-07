@@ -18,6 +18,7 @@ def run_loop(
     before_tool: Callable[[dict], str | None],
     max_turns: int = 80,
     before_turn: Callable[[list[dict]], list[dict]] | None = None,
+    should_stop: Callable[[], bool] | None = None,
 ) -> str:
     """Drive model→tool turns until the model replies with no tool calls.
 
@@ -29,10 +30,15 @@ def run_loop(
                  blocked calls are recorded as "BLOCKED: <reason>".
     before_turn  reserved for day-3 context compaction; unused today.
     max_turns    safety ceiling; on exhaustion one final no-tool call wraps up.
+    should_stop  optional callback to check if loop should stop early.
     """
     specs = [t.spec for t in tools.values()]
 
     for _ in range(max_turns):
+        # Check if stop was requested
+        if should_stop and should_stop():
+            return "Session stopped by user."
+        
         # Day-3 hook: context compaction fires here; no-op when None.
         if before_turn is not None:
             messages[:] = before_turn(messages)

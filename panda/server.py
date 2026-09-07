@@ -113,6 +113,19 @@ def api_stream(run_id: str):
                              "Access-Control-Allow-Origin": "*"})
 
 
+@app.post("/api/stop/<run_id>")
+def api_stop(run_id: str):
+    run = _runs.get(run_id)
+    if not run:
+        return jsonify({"error": "run not found"}), 404
+    
+    harness = run.get("harness")
+    if harness:
+        harness.stop()
+    
+    return jsonify({"status": "stopped"})
+
+
 @app.get("/api/files")
 def api_files():
     workdir = request.args.get("workdir", "")
@@ -208,13 +221,20 @@ _HTML = r"""<!DOCTYPE html>
   select option { background: var(--bg); }
   .prompt-wrap { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
   textarea#prompt { flex: 1; resize: none; font-size: 13px; line-height: 1.5; min-height: 120px; }
-  button#run-btn {
-    background: var(--accent); color: #fff; border: none; border-radius: var(--radius);
+  button#run-btn, button#stop-btn {
+    border: none; border-radius: var(--radius);
     padding: 9px 0; font-size: 14px; font-weight: 600; cursor: pointer;
     transition: opacity .2s; width: 100%;
   }
+  button#run-btn {
+    background: var(--accent); color: #fff;
+  }
+  button#stop-btn {
+    background: var(--red); color: #fff; display: none;
+  }
   button#run-btn:disabled { opacity: .45; cursor: not-allowed; }
   button#run-btn:not(:disabled):hover { opacity: .88; }
+  button#stop-btn:hover { opacity: .88; }
   .hint { font-size: 11px; color: var(--muted); text-align: center; }
 
   /* ── Stream panel ── */
@@ -333,6 +353,7 @@ _HTML = r"""<!DOCTYPE html>
       <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Prompt</label>
       <textarea id="prompt" placeholder="Describe what you want to build…&#10;&#10;e.g. Build a FastAPI hello-world with /health and /echo endpoints, and a test suite."></textarea>
       <button id="run-btn" onclick="startRun()">▶ Run  <kbd style="font-size:10px;opacity:.6">Ctrl+↵</kbd></button>
+      <button id="stop-btn" onclick="stopRun()">⏹ Stop Session</button>
       <div class="hint">Files are written to the working directory</div>
     </div>
   </div>
@@ -367,11 +388,13 @@ _HTML = r"""<!DOCTYPE html>
 <script>
 let _es = null;
 let _turns = 0;
+let _currentRunId = null;
 
 function setStatus(running) {
   document.getElementById('status-dot').classList.toggle('running', running);
   document.getElementById('status-label').textContent = running ? 'running' : 'idle';
   document.getElementById('run-btn').disabled = running;
+  document.getElementById('stop-btn').style.display = running ? 'block' : 'none';
 }
 
 function card(cls, labelText, bodyHTML) {
@@ -422,6 +445,7 @@ async function startRun() {
     if (data.error) throw new Error(data.error);
     run_id  = data.run_id;
     workdir = data.workdir;
+    _currentRunId = run_id;
     document.getElementById('workdir').value = workdir;
     document.getElementById('stream-title').textContent = `Run · ${workdir}`;
   } catch(e) {
@@ -508,6 +532,25 @@ async function openFile(path, name) {
 
 function closeViewer() {
   document.getElementById('viewer').classList.remove('open');
+}
+
+async function stopRun() {
+  if (!_currentRunId) return;
+  
+  try {
+    const r = await fetch(`/api/stop/${_currentRunId}`, {
+      method: 'POST',
+    });
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    addCard(card('complete-card', '⏹ stopped', `<pre>Session stopped by user</pre>`));
+  } catch(e) {
+    addCard(card('error-card', '⚠ Error', `<pre>${escHtml(e.message)}</pre>`));
+  }
+  
+  if (_es) { _es.close(); _es = null; }
+  setStatus(false);
+  _currentRunId = null;
 }
 
 document.getElementById('prompt').addEventListener('keydown', e => {

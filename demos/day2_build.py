@@ -10,8 +10,8 @@ import os, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from panda import loop, provider
-from panda.tools import core_tools
-from panda.security import Policy
+from PatchPilot.panda.tools import core_tools
+from PatchPilot.panda.security import Policy
 
 SYSTEM = (
     "You are a precise coding assistant with file-system and shell tools. "

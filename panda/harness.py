@@ -6,7 +6,9 @@ Design  : Harness is the only public class; it wires workdir, model, policy,
           sub-agents into run_loop. No logic lives here that belongs elsewhere.
 """
 import os, pathlib
-from . import loop, provider, session
+from . import session
+from . import loop
+from . import provider
 from .context  import compact
 from .memory   import build_system_prompt, remember as _remember
 from .security import Policy
@@ -48,6 +50,7 @@ class Harness:
         self.on_event      = on_event or _default_event
         self.persist       = persist
         self.messages: list[dict] = []
+        self._stopped      = False
 
         # ── Tools ──────────────────────────────────────────────────────────
         self.tools = {t.name: t for t in core_tools(self.workdir)}
@@ -80,6 +83,10 @@ class Harness:
         # ── System prompt ──────────────────────────────────────────────────
         extra = "\n\n".join(filter(None, [cat, system_extra]))
         self.system = build_system_prompt(self.workdir, extra)
+
+    def stop(self) -> None:
+        """Stop the running session."""
+        self._stopped = True
 
     def resume(self, path: str | None = None) -> bool:
         """Load the latest (or given) session; return True when messages loaded."""
@@ -122,7 +129,7 @@ class Harness:
             model=self.model, system=self.system, messages=self.messages,
             tools=self.tools, on_event=_on_event,
             before_tool=self.policy.check, before_turn=_before_turn,
-            max_turns=self.max_turns,
+            max_turns=self.max_turns, should_stop=lambda: self._stopped,
         )
         _flush()
         return result

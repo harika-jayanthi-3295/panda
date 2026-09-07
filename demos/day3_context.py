@@ -9,9 +9,9 @@ import os, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from panda import loop, provider
-from panda.context import compact, estimate_tokens
-from panda.tools import core_tools
-from panda.security import Policy
+from PatchPilot.panda.context import compact, estimate_tokens
+from PatchPilot.panda.tools import core_tools
+from PatchPilot.panda.security import Policy
 
 BUDGET = 4000   # tight budget so compaction triggers within a few turns
 

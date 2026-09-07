@@ -11,6 +11,7 @@ DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
 
 def api_key() -> str:
+    
     """Return PANDA_API_KEY → CLAUDE_API_KEY; raise RuntimeError when absent."""
     k = os.environ.get("PANDA_API_KEY") or os.environ.get("CLAUDE_API_KEY")
     if not k:
