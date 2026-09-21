@@ -1,10 +1,3 @@
-"""
-Day 4 – Harness
-Teaches : composing a week of modules into one coherent, resumable coding agent.
-Design  : Harness is the only public class; it wires workdir, model, policy,
-          tools, system prompt, session persistence, compaction, and optional
-          sub-agents into run_loop. No logic lives here that belongs elsewhere.
-"""
 import os, pathlib
 from . import session
 from . import loop
@@ -15,6 +8,7 @@ from .security import Policy
 from .skills   import catalog_prompt, read_skill
 from .subagent import subagent_tool
 from .tools    import Tool, core_tools, tool
+from . import wiki as _wiki
 
 
 class Harness:
@@ -68,6 +62,20 @@ class Harness:
             def use_skill(name: str) -> str:
                 return read_skill(self.workdir, name)
             self.tools["use_skill"] = use_skill
+
+        @tool("Save or update a wiki entry: routes to the best-matching "
+              "existing entry (merge) or creates a new, cross-linked one",
+              title="short topic title", body="the fact or finding to record",
+              source="where this came from, e.g. a file path or 'conversation'")
+        def wiki_save(title: str, body: str, source: str = "conversation") -> str:
+            return _wiki.save(self.workdir, title, body, source)
+        self.tools["wiki_save"] = wiki_save
+
+        @tool("Search the wiki for entries relevant to a question",
+              query="keywords or a question", top_k="max entries to return, default 3")
+        def wiki_query(query: str, top_k: str = "3") -> str:
+            return _wiki.query(self.workdir, query, int(top_k))
+        self.tools["wiki_query"] = wiki_query
 
         if enable_subagents:
             def _make_child(d: int) -> "Harness":

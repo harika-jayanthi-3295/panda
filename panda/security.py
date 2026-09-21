@@ -1,13 +1,7 @@
-"""
-Day 2 – Security
-Teaches : policy-based access control via a deny-list and escalating modes.
-Design  : READ_TOOLS and DENY_PATTERNS are module constants; Policy.check
-          returns None (allow) or a reason string (block).
-"""
 import re
 
 # Tools that only read state — always safe in any mode.
-READ_TOOLS = {"read_file", "list_files", "grep"}
+READ_TOOLS = {"read_file", "list_files", "grep", "wiki_query"}
 
 # Bash patterns blocked regardless of mode (destructive rm, privilege
 # escalation, raw disk ops, remote exec, forced git rewrite, device writes).

@@ -1,9 +1,3 @@
-"""
-Day 1 – Agent loop
-Teaches : the think / act / observe cycle at the heart of every LLM agent.
-Design  : single public function (run_loop); no global state; delegates all
-          HTTP to provider; two extension hooks for later days.
-"""
 from __future__ import annotations
 from typing import Any, Callable
 from . import provider
@@ -28,18 +22,16 @@ def run_loop(
                     ("tool_end", {call, result}).
     before_tool  returns None to allow a call, or a reason string to block it;
                  blocked calls are recorded as "BLOCKED: <reason>".
-    before_turn  reserved for day-3 context compaction; unused today.
+    before_turn  optional context-compaction hook, called before each model turn.
     max_turns    safety ceiling; on exhaustion one final no-tool call wraps up.
     should_stop  optional callback to check if loop should stop early.
     """
     specs = [t.spec for t in tools.values()]
 
     for _ in range(max_turns):
-        # Check if stop was requested
         if should_stop and should_stop():
             return "Session stopped by user."
-        
-        # Day-3 hook: context compaction fires here; no-op when None.
+
         if before_turn is not None:
             messages[:] = before_turn(messages)
 

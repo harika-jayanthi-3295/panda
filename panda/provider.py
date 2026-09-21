@@ -1,9 +1,3 @@
-"""
-Day 1 – Provider
-Teaches : wrapping a remote LLM API in a thin, retry-safe HTTP layer.
-Design  : pure stdlib; one public entry-point (complete); HTTP isolated in _post;
-          neutral message format decouples callers from the Anthropic wire format.
-"""
 import json, os, time, urllib.error, urllib.request
 
 API_ROOT      = "https://api.anthropic.com/"
@@ -30,7 +24,7 @@ def complete(model: str, system: str, messages: list[dict],
     hdrs = {"Content-Type": "application/json",
             "x-api-key": api_key(), "anthropic-version": "2023-06-01"}
     body: dict = {
-        "model": model, "max_tokens": 32000, "temperature": 0.4,
+        "model": model, "max_tokens": 32000,
         "system": system, "messages": _to_wire(messages),
     }
     if tools:

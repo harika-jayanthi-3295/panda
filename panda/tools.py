@@ -1,11 +1,3 @@
-"""
-Day 2 – Tools
-Teaches : the tool protocol (spec + run) and the path-safety sandbox pattern.
-Design  : Tool is a plain dataclass; tool() builds spec from the function
-          signature so documentation lives once; core_tools closes over a
-          resolved workdir path and every path flows through one resolve()
-          that enforces the sandbox boundary with a single is_relative_to check.
-"""
 import fnmatch, inspect, pathlib, re, subprocess
 from dataclasses import dataclass
 from typing import Callable

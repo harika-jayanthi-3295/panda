@@ -1,11 +1,3 @@
-"""
-Day 3 – Skills
-Teaches : a filesystem-backed skill catalog that hints at capabilities in the
-          system prompt and loads full skill text on demand.
-Design  : each skill is a directory under skills/ containing SKILL.md; the
-          description is pulled from a "description:" front-matter line when
-          present, falling back to the directory name.
-"""
 import pathlib
 
 SKILLS_DIR = "skills"

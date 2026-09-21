@@ -1,11 +1,3 @@
-"""
-Day 5 – Fleet
-Teaches : embarrassingly parallel agent execution using stdlib only.
-Design  : ThreadPoolExecutor submits one job per thread; futures are collected
-          in input order so the caller can zip(jobs, results) without sorting;
-          exceptions are caught per-job and turned into error reports so one
-          bad job never kills the whole fleet.
-"""
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 

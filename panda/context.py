@@ -1,9 +1,3 @@
-"""
-Day 3 – Context engine
-Teaches : token-budget compaction to keep long conversations inside the model window.
-Design  : estimate_tokens uses a char-count heuristic; compact summarises old turns
-          with one model call and splices the summary before the KEEP_RECENT slice.
-"""
 from . import provider
 
 CHARS_PER_TOKEN = 4

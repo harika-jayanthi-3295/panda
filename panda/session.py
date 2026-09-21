@@ -1,12 +1,3 @@
-"""
-Day 4 – Session
-Teaches : durable conversation persistence with torn-tail repair so a killed
-          process can resume where it left off without violating the
-          call/response pairing rule the provider requires.
-Design  : one .jsonl per session; append is the only write path; load stops
-          at the first unparseable line (the torn tail) and calls _repair
-          before returning so the caller always gets a valid message list.
-"""
 import json, pathlib, re, time
 
 SESSION_DIR = ".panda/sessions"

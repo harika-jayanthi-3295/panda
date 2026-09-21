@@ -1,11 +1,3 @@
-"""
-Day 4 – Sub-agent
-Teaches : recursive delegation — a tool that launches a fresh child Harness
-          so the parent can decompose tasks without sharing its context.
-Design  : make_harness is injected by Harness so this module stays free of
-          a Harness import, avoiding a circular dependency. max_depth caps
-          recursion before the stack blows up.
-"""
 from .tools import tool
 
 

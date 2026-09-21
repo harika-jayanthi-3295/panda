@@ -1,10 +1,3 @@
-"""
-Day 3 – Memory
-Teaches : durable project memory injected into the system prompt each session.
-Design  : panda.md accumulates bullet facts across runs; build_system_prompt
-          layers base instructions, platform info, memory, and caller extras
-          so every module above it stays unaware of session state.
-"""
 import pathlib, platform
 
 MEMORY_FILE = "panda.md"
