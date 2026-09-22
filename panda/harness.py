@@ -63,12 +63,14 @@ class Harness:
                 return read_skill(self.workdir, name)
             self.tools["use_skill"] = use_skill
 
-        @tool("Save or update a wiki entry: routes to the best-matching "
-              "existing entry (merge) or creates a new, cross-linked one",
+        @tool("Save a fact to the wiki: the model routes it to an existing "
+              "entry (rewriting that entry to absorb it) or creates a new, "
+              "cross-linked one. Read the result — it reports CONFLICT when "
+              "the fact contradicts what is already recorded",
               title="short topic title", body="the fact or finding to record",
               source="where this came from, e.g. a file path or 'conversation'")
         def wiki_save(title: str, body: str, source: str = "conversation") -> str:
-            return _wiki.save(self.workdir, title, body, source)
+            return _wiki.save(self.workdir, title, body, source, model=self.model)
         self.tools["wiki_save"] = wiki_save
 
         @tool("Search the wiki for entries relevant to a question",
